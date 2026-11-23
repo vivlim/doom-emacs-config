@@ -6,8 +6,8 @@
 
 ;; Some functionality uses this to identify you, e.g. GPG configuration, email
 ;; clients, file templates and snippets. It is optional.
-;; (setq user-full-name "John Doe"
-;;       user-mail-address "john@doe.com")
+(setq user-full-name "Viv"
+      user-mail-address "viv@vvn.space")
 
 ;; Doom exposes five (optional) variables for controlling fonts in Doom:
 ;;
@@ -50,6 +50,10 @@
 ;; change `org-directory'. It must be set before org loads!
 (setq org-directory "~/org/")
 
+(add-to-list 'auto-mode-alist '("\\.csproj\\'" . nxml-mode))
+
+(require 'which-key)
+(setq which-key-idle-delay 0.1)
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `with-eval-after-load' block, otherwise Doom's defaults may override your
@@ -88,3 +92,32 @@
 ;; journalctl mode's bindings take precedence.
 (with-eval-after-load 'journalctl-mode
   (evil-make-overriding-map journalctl-mode-map 'normal))
+
+(setq vc-handled-backends '(Git))
+(setq remote-file-name-inhibit-locks t
+      tramp-use-scp-direct-remote-copying t
+      remote-file-name-inhibit-auto-save-visited t)
+(connection-local-set-profile-variables
+ 'remote-direct-async-process
+ '((tramp-direct-async-process . t)))
+
+(connection-local-set-profiles
+ '(:application tramp :protocol "scp")
+ 'remote-direct-async-process)
+
+(setq magit-tramp-pipe-stty-settings 'pty)
+
+(defun viv-banner-ascii ()
+  (let* ((banner '(" ___________________________  "
+                   "(                      > '.')>"
+                   " ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯  "))
+         (longest-line (apply #'max (mapcar #'length banner))))
+    (put-text-property
+     (point)
+     (dolist (line banner (point))
+       (insert (+dashboard-center
+                (concat line (make-string (max 0 (- longest-line (length line))) 32)))
+               "\n"))
+     'face 'doom-dashboard-banner)))
+
+(setq +dashboard-ascii-banner-fn #'viv-banner-ascii)
