@@ -93,6 +93,9 @@
 (with-eval-after-load 'journalctl-mode
   (evil-make-overriding-map journalctl-mode-map 'normal))
 
+(after! evil
+  (setopt evil-escape-key-sequence "jk"))
+
 (setq vc-handled-backends '(Git))
 (setq remote-file-name-inhibit-locks t
       tramp-use-scp-direct-remote-copying t
