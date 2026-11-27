@@ -110,6 +110,18 @@
 
 (setq magit-tramp-pipe-stty-settings 'pty)
 
+;; (after! 'eglot
+;;   (add-to-list 'eglot-server-programs
+;;                '((rust-ts-mode rust-mode) .
+;;                  ("rust-analyzer" :initializationOptions (:check (:command "clippy"))))))
+;; (after! lsp-rust
+;;   (setq! lsp-rust-analyzer-display-chaining-hints t)
+;;   (setq! lsp-rust-analyzer-max-inlay-hint-length 25)
+;;   (setq! lsp-rust-analyzer-proc-macro-enable t)
+;;   (setq! lsp-inlay-hint-enable t)
+;;   (setq! lsp-rust-analyzer-cargo-watch-command "clippy"))
+
+
 (defun viv-banner-ascii ()
   (let* ((banner '(" ___________________________  "
                    "(                      > '.')>"
@@ -124,3 +136,23 @@
      'face 'doom-dashboard-banner)))
 
 (setq +dashboard-ascii-banner-fn #'viv-banner-ascii)
+
+;; project commands
+
+(defvar-local viv/project-commands nil
+  "List of (LABEL . COMMAND) pairs for the current project.")
+(put 'viv/project-commands 'safe-local-variable #'listp)
+
+(defun viv/run-project-command ()
+  "Pick a command from viv/project-commands and run it in the project root."
+  (interactive)
+  (unless viv/project-commands
+    (user-error "No viv/project-commands defined in .dir-locals.el"))
+    (let* ((choice (completing-read "Run project command: " viv/project-commands nil t))
+           (cmd (cdr (assoc choice viv/project-commands)))
+           (default-directory (projectile-ensure-project (projectile-project-root))))
+      (compile cmd)))
+
+(map! :leader
+      :prefix "p"
+      :desc "Run viv project command" "v" #'viv/run-project-command)
